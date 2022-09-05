@@ -1,10 +1,13 @@
+from collections import defaultdict
 from datetime import datetime
+from decimal import Decimal
 
+import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from psycopg2 import pool
 
-from logic import format_db_row_to_transaction
+from logic import format_db_row_to_transaction, LIVE_PRICE_URL, TransactionType
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -74,6 +77,66 @@ def get_transactions():
             format_db_row_to_transaction(row) for row in rows
         ]
     )
+
+
+@app.route("/rollups")
+def get_rollups_by_coin():
+    portfolio = defaultdict(
+        lambda: {
+            "total_coins": 0,
+            "total_cost": Decimal(0.0),
+            "total_equity": Decimal(0.0),
+            "live_price": Decimal(0.0)
+        }
+    )
+
+    conn = postgreSQL_pool.getconn()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT symbol, type, sum(amount) as total_amount, sum(no_of_coins) as total_coins "
+        "FROM transaction GROUP BY symbol, type"
+    )
+    rows = cur.fetchall()
+
+    for row in rows:
+        coin = row[0]
+        transaction_type = row[1]
+        amount = row[2]
+        total_coins = row[3]
+
+        if transaction_type == TransactionType.BOUGHT.value:
+            portfolio[coin]['total_cost'] += amount
+            portfolio[coin]['total_coins'] += total_coins
+        else:
+            portfolio[coin]['total_cost'] -= amount
+            portfolio[coin]['total_coins'] -= total_coins
+
+    symbol_to_coin_id_map = {
+        "BTC": "bitcoin",
+        "SOL": "solana",
+        "LINK": "chainlink",
+        "ETH": "ethereum",
+        "ADA": "cardano",
+        "MANA": "decentraland"
+    }
+    rollup_response = []
+
+    for symbol in portfolio:
+        response = requests.get(f"{LIVE_PRICE_URL}?ids={symbol_to_coin_id_map[symbol]}&vs_currencies=usd").json()
+
+        live_price = response[symbol_to_coin_id_map[symbol]]['usd']
+        portfolio[symbol]['live_price'] = live_price
+        portfolio[symbol]['total_equity'] = portfolio[symbol]['total_coins'] * live_price
+
+        rollup_response.append({
+            "symbol": symbol,
+            "live_price": portfolio[symbol]['live_price'],
+            "total_coins": portfolio[symbol]['total_coins'],
+            "total_cost": float(portfolio[symbol]['total_cost']),
+            "total_equity": portfolio[symbol]['total_equity'],
+        })
+
+    return jsonify(rollup_response)
 
 
 if __name__ == '__main__':
