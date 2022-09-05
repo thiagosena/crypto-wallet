@@ -5,6 +5,7 @@ import Summary from './components/Summary';
 import TransactionsTable from './components/TransactionsTable';
 import Visualization from './components/Visualization';
 import { Transaction } from './interfaces/Transaction';
+import AddModal from './components/AddModal';
 
 export const App = () => {
   const [transactions, setTransactions] = useState<Array<Transaction>>([]);
@@ -42,6 +43,7 @@ export const App = () => {
 
   return (
     <ChakraProvider theme={theme}>
+      <AddModal isOpen={isOpen} onClose={onClose}></AddModal>
       <Center bg={'black'} color={'white'} padding={8}>
         <VStack spacing={7}>
           <Heading>Crypto Portfolio</Heading>
