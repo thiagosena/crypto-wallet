@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Button, Center, ChakraProvider, Heading, Text, theme, useDisclosure, VStack } from '@chakra-ui/react';
 import Summary from './components/Summary';
 import TransactionsTable from './components/TransactionsTable';
+import Visualization from './components/Visualization';
 import { Transaction } from './interfaces/Transaction';
 
 export const App = () => {
@@ -52,6 +53,7 @@ export const App = () => {
                    portfolioValue={portfolioValue}
                    absoluteGain={absoluteGain}
                    totalGainPercent={totalGainPercent} />
+          <Visualization rollups={rollups} />
           <TransactionsTable transactions={transactions}></TransactionsTable>
         </VStack>
       </Center>
