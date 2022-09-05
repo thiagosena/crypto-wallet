@@ -4,6 +4,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from psycopg2 import pool
 
+from logic import format_db_row_to_transaction
+
 app = Flask(__name__)
 cors = CORS(app)
 
@@ -59,6 +61,19 @@ def new_transaction():
     conn.commit()
 
     return jsonify(request.json)
+
+
+@app.route("/transactions")
+def get_transactions():
+    cur = postgreSQL_pool.getconn().cursor()
+    cur.execute('SELECT * FROM transaction')
+    rows = cur.fetchall()
+
+    return jsonify(
+        [
+            format_db_row_to_transaction(row) for row in rows
+        ]
+    )
 
 
 if __name__ == '__main__':
