@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: db_crypto
+    volumes:
+      - db-crypto-data:/var/lib/postgresql/data
+
+volumes:
+  db-crypto-data:
