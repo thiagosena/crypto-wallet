@@ -9,7 +9,7 @@ export default function Summary({
 }: { portfolioCost: number, portfolioValue: number, absoluteGain: number, totalGainPercent: number }) {
   return (
     <HStack spacing={6}>
-      <Container bg="dodgerblue">
+      <Container bg={portfolioValue - portfolioCost > 0 ? 'green' : 'tomato'}>
         <VStack width={40}>
           <Text fontSize="2xl">
             R$ {Number(portfolioCost.toFixed(2)).toLocaleString()}
@@ -19,7 +19,7 @@ export default function Summary({
           </Text>
         </VStack>
       </Container>
-      <Container bg="tomato">
+      <Container bg={portfolioValue - portfolioCost > 0 ? 'green' : 'tomato'}>
         <VStack width={40}>
           <Text fontSize="2xl">
             R$ {Number(portfolioValue.toFixed(2)).toLocaleString()}
@@ -27,7 +27,7 @@ export default function Summary({
           <Text fontSize="xs">Portfolio Value</Text>
         </VStack>
       </Container>
-      <Container bg="tomato">
+      <Container bg={portfolioValue - portfolioCost > 0 ? 'green' : 'tomato'}>
         <VStack width={40}>
           <Text fontSize="2xl">
             R$ {Number(absoluteGain.toFixed(2)).toLocaleString()}
@@ -35,7 +35,7 @@ export default function Summary({
           <Text fontSize="xs"> Absolute Gain / Loss </Text>
         </VStack>
       </Container>
-      <Container bg="tomato">
+      <Container bg={portfolioValue - portfolioCost > 0 ? 'green' : 'tomato'}>
         <VStack width={40}>
           <Text fontSize="2xl">{totalGainPercent.toFixed(2)} %</Text>
           <Text fontSize="xs">Gain / Loss %</Text>
