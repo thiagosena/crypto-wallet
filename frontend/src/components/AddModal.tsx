@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Button, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, VStack } from '@chakra-ui/react';
+import { SingleDatepicker } from 'chakra-dayzed-datepicker';
 
-export default function AddModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
-  const [type, setType] = useState<string>('');
+export default function AddModal(this: any, { isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
+  const [type, setType] = useState<string>('1');
   const [name, setName] = useState<string>('');
   const [symbol, setSymbol] = useState<string>('');
-  const [transactionDate, setTransactionDate] = useState<string>('');
+  const [transactionDate, setTransactionDate] = useState<Date>(new Date());
   const [pricePurchasedAt, setPricePurchasedAt] = useState<string>('');
   const [numberOfCoins, setNumberOfCoins] = useState<string>('');
 
@@ -14,7 +15,7 @@ export default function AddModal({ isOpen, onClose }: { isOpen: boolean, onClose
       name: name,
       symbol: symbol,
       type: type,
-      time_transacted: Date.parse(transactionDate) / 1000,
+      time_transacted: transactionDate.getTime() / 1000,
       price_purchased_at: pricePurchasedAt,
       no_of_coins: numberOfCoins,
     });
@@ -30,9 +31,54 @@ export default function AddModal({ isOpen, onClose }: { isOpen: boolean, onClose
       });
   };
 
-  const options = [
-    { value: 0, label: 'Sell' },
-    { value: 1, label: 'Buy' },
+  const props = {
+    dateNavBtnProps: {
+      colorScheme: 'blue',
+      variant: 'flushed',
+    },
+    dayOfMonthBtnProps: {
+      defaultBtnProps: {
+        _hover: {
+          background: 'blue.400',
+          color: 'white',
+        },
+      },
+      selectedBtnProps: {
+        background: 'blue.200',
+        color: 'black',
+      },
+      todayBtnProps: {
+        background: 'gray.300',
+      },
+    },
+    inputProps: {
+      variant: 'flushed',
+    },
+  };
+
+  const monthNameShort = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  const weekdayNameShort = [
+    'Sun',
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
   ];
 
   return (
@@ -45,6 +91,7 @@ export default function AddModal({ isOpen, onClose }: { isOpen: boolean, onClose
           <ModalBody>
             <VStack spacing={8}>
               <Select focusBorderColor="tomato"
+                      value={type}
                       onChange={(e) => setType(e.target.value)}
                       variant={'flushed'}>
                 <option value="1">Buy</option>
@@ -71,13 +118,18 @@ export default function AddModal({ isOpen, onClose }: { isOpen: boolean, onClose
                 variant="flushed"
                 placeholder="Price Purchased At"
               />
-              <Input
-                value={transactionDate}
-                onChange={(e) => setTransactionDate(e.target.value)}
-                focusBorderColor="tomato"
-                variant="flushed"
-                placeholder="Transaction Date (MM-DD-YYYY)"
+
+              <SingleDatepicker
+                propsConfigs={props}
+                date={transactionDate}
+                onDateChange={setTransactionDate}
+                configs={{
+                  dateFormat: 'dd/MM/yyyy',
+                  dayNames: weekdayNameShort,
+                  monthNames: monthNameShort,
+                }}
               />
+
               <Input
                 value={numberOfCoins}
                 onChange={(e) => setNumberOfCoins(e.target.value)}
