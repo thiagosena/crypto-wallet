@@ -4,5 +4,6 @@ export interface Transaction {
   amount: number,
   no_of_coins: number,
   price_purchased_at: any,
-  time_transacted: any
+  time_transacted: any,
+  type: number
 }

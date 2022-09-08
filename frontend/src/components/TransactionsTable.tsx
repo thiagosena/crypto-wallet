@@ -17,6 +17,7 @@ export default function TransactionsTable({ transactions }: { transactions: Arra
             <Th>Number of Coins</Th>
             <Th>Price Purchased At</Th>
             <Th>Date</Th>
+            <Th>Transaction</Th>
           </Tr>
         </Thead>
         <Tbody>
